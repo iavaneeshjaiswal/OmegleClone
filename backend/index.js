@@ -1,13 +1,27 @@
-import express, { urlencoded } from "express";
 import http from "http";
-import socketIo from "socket.io";
-// import db from "./config/db.js";
-
+import express, { urlencoded } from "express";
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+import dotenv from "dotenv";
+dotenv.config();
+import connectDb from "./config/db.js";
+import cors from "cors";
+import { setupSocket } from "./socket.js";
 
+const server = http.createServer(app);
+
+// Connection from MongoDB
+connectDb();
+
+//🔥 Initialize Socket.io
+setupSocket(server);
+
+//middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
-export { app, io };
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
